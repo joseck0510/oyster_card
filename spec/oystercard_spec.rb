@@ -27,6 +27,7 @@ describe Oystercard do
   context "knows when it is on a journey" do
 
     it "can touch in" do
+      subject.top_up(1)
       expect(subject).to respond_to(:touch_in)
       subject.touch_in
       expect(subject.in_journey?).to eq(true)
@@ -37,8 +38,12 @@ describe Oystercard do
       subject.touch_out
       expect(subject.in_journey?).to eq(false)
     end
+  end
 
-
-
+  context "exception handling" do
+    it "It prevents touch in if the balance is below the #{Oystercard::MINIMUM_FARE} pound minimum, and raises an error" do
+    subject.top_up(0.50)
+      expect{subject.touch_in}.to raise_error "Your balance is under #{Oystercard::MINIMUM_FARE} pound, please top up first"
+    end
   end
 end
