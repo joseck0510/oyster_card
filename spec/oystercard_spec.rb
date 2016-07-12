@@ -1,6 +1,7 @@
 require 'oystercard'
 
 describe Oystercard do
+    let(:station) {double :station}
 
     context "Card balance" do
 
@@ -14,18 +15,16 @@ describe Oystercard do
 
     it "is deducted by the minimum fare when touch_out is called" do
       subject.top_up(20)
-      subject.touch_in
+      subject.touch_in(station)
       expect{ subject.touch_out }.to change{ subject.balance }.by(-Oystercard::MINIMUM_FARE)
     end
-
   end
 
   context "knows when it is on a journey" do
-
     it "can touch in" do
       subject.top_up(1)
       expect(subject).to respond_to(:touch_in)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject.in_journey?).to eq(true)
     end
 
@@ -39,12 +38,29 @@ describe Oystercard do
   context "exception handling" do
     it "It prevents touch in if the balance is below the #{Oystercard::MINIMUM_FARE} pound minimum, and raises an error" do
     subject.top_up(0.50)
-      expect{subject.touch_in}.to raise_error "Your balance is under #{Oystercard::MINIMUM_FARE} pound, please top up first"
+      expect{subject.touch_in(station)}.to raise_error "Your balance is under #{Oystercard::MINIMUM_FARE} pound, please top up first"
     end
 
     it "cannot top-up to a balance exceeding the limit of #{Oystercard::BALANCE_LIMIT}" do
       limit = Oystercard::BALANCE_LIMIT
       expect{ subject.top_up(limit + 1) }.to raise_error "Maximum balance of #{limit} would be exceeded"
+    end
+  end
+
+  context "recording journeys" do
+    it "responds to touch in with one station argument" do
+      expect(subject).to respond_to(:touch_in).with(1).arguments
+    end
+    it "records the entry station of journey" do
+      subject.top_up(20)
+      subject.touch_in(station)
+      expect( subject.entry_station ).to eq(station)
+    end
+    it "clears entry station on touch out" do
+      subject.top_up(20)
+      subject.touch_in(station)
+      subject.touch_out
+      expect( subject.entry_station ).to eq nil
     end
   end
 end
