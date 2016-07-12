@@ -28,15 +28,14 @@ describe Oystercard do
 
     it "can touch in" do
       expect(subject).to respond_to(:touch_in)
-      expect(subject.touch_in).to eq(subject.in_journey?)
-
+      subject.touch_in
+      expect(subject.in_journey?).to eq(true)
     end
 
     it "can touch out" do
       expect(subject).to respond_to(:touch_out)
       subject.touch_out
       expect(subject.in_journey?).to eq(false)
-
     end
 
 
