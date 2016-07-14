@@ -17,12 +17,12 @@ class Oystercard
 
   def touch_in(station)
     sufficient_balance_check?
-    @entry_station = station
+    @entry_station = station #  journey.new(entry_station: station)
   end
 
   def touch_out(station)
     deduct(MINIMUM_FARE)
-    @exit_station = station
+    @exit_station = station #
     @journey = {entry_station: entry_station, exit_station: exit_station}
     self.journey_history_array << journey
     journey
