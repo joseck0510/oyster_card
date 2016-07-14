@@ -5,8 +5,6 @@ describe Oystercard do
   let(:exit_station) {double :station}
   let(:journey){ {entry_station: entry_station, exit_station: exit_station} }
 
-  it {is_expected.to respond_to(:entry_station) }
-
   it 'checks to see if the balance is 0' do
     expect(subject.balance).to eq 0
   end
@@ -23,6 +21,10 @@ describe Oystercard do
   end
 
   describe 'status of card' do
+
+    it 'has an empty list of journeys by default' do
+      expect(subject.journey_history_array).to be_empty
+    end
 
     it 'is initially not in a journey' do
       expect(subject).not_to be_in_journey
@@ -45,25 +47,15 @@ describe Oystercard do
     end
     it 'touch out' do
       subject.touch_out(exit_station)
-      expect(subject).not_to be_in_journey
+      expect(subject.in_journey?).to eq false
     end
     it 'charge balance on touch out' do
       expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by -Oystercard::MINIMUM_FARE
     end
 
-    it "remembers entry station" do
-        expect(subject.entry_station).to eq entry_station
-    end
-
-    it 'remembers exit station' do
-      subject.touch_out(exit_station)
-      expect(subject.exit_station).to eq exit_station
-    end
-
     it 'stores a journey' do
       subject.touch_out(exit_station)
-      expect(subject.journey).to include journey
+      expect(subject.journey_history_array).to include journey
     end
   end
-
 end
